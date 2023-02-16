@@ -42,6 +42,7 @@ namespace QuickSearchTest
 
         readonly string _connectionString;
         List<PairToken> _tokensList;
+        List<PairToken> _tokensBrandList;
         int _lengthOfToken=3;
         Stopwatch _timer;
         DataTable rawDataTable;
@@ -89,6 +90,7 @@ namespace QuickSearchTest
         private void button1_Click(object sender, EventArgs e)
         {
             _tokensList = new List<PairToken>();
+            _tokensBrandList = new List<PairToken>();
             foreach(DataRow row in rawDataTable.Rows)
             {
                 int idTov = Convert.ToInt32(row.ItemArray[3]);
@@ -103,6 +105,13 @@ namespace QuickSearchTest
                     _tokensList.Add(pair);
                 }
 
+                List<string> tokenByBrand = TokenizeWord(normalizedBrand);
+
+                foreach (var token in tokenByBrand)
+                {
+                    var pair = new PairToken(idTov, token);
+                    _tokensBrandList.Add(pair);
+                }
 
             }
 
@@ -152,6 +161,47 @@ namespace QuickSearchTest
             return listOfResult;
         }
 
+
+        private bool CheckWord(string norm)
+        {
+            int id_start_brand =0 ;
+            int id_end_brand =0;
+            bool f_start_brand = false;
+            bool f_end_brand = false;
+            for (int i = 0; i < norm.Length; i++)
+            {
+                if (!f_start_brand)
+                {
+                    if (norm[i] >= 'a' && norm[i] <= 'z')
+                    {
+                        id_start_brand = i;
+                        f_start_brand = true;
+                    }
+                }
+                else
+                {
+                    if ((norm[i] < 'a' && norm[i] > 'z') || i == norm.Length-1)
+                    {
+                        id_end_brand = i;
+                        f_end_brand = true;
+                        break;
+                    }
+                }
+            }
+
+            return f_start_brand && f_end_brand ? true : false;
+
+            //if(f_start_brand && f_end_brand)
+            //{
+            //    return norm.Substring(id_start_brand, id_end_brand - id_start_brand + 1);
+            //}
+            //else
+            //{
+            //    return "dlskfjsf";
+            //}
+
+        }
+
         //Выполнить поиск по слову из ввода
         private void button2_Click(object sender, EventArgs e)
         {
@@ -162,8 +212,12 @@ namespace QuickSearchTest
                 //Нормализуем ввод и разбиваем его на токены
                 var word = NormalizeString(textBox1.Text);
                 var listOfTokens = TokenizeWord(word);
-                float procent = 0.6f;
                 float countTargetTokens = listOfTokens.Count;
+
+                // Проверка слова на : только брэнд, вт + брэнд, вт
+
+                float procent = CheckWord(word)? 0.6f : 0.5f;
+
                 //Ищем по существующим токенам пары с токенами из запроса
                 List<PairToken> resultPair = new List<PairToken>();
                 resultPair = _tokensList.Join(listOfTokens, t => t._token, x => x, (t, x) =>
@@ -174,13 +228,13 @@ namespace QuickSearchTest
                                              select id._idTov);
 
                 //Подсчитываем количество совпадений токенов по id
-                var resultMatch = listOfId.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+                var resultMatch = listOfId.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count())
+                    .OrderByDescending(x=> x.Value);
 
 
                 //Выбираем id по максимальному количеству совпадений
 
-                var idMaxMatch = resultMatch.OrderByDescending(x => x.Value)
-                                            .Where(x => x.Value / countTargetTokens >= procent);
+                var idMaxMatch = resultMatch.Where(x => x.Value / countTargetTokens >= procent);
 
 
                 //Ищем в датасорсе наименование по id
