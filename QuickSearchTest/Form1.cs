@@ -187,7 +187,7 @@ namespace QuickSearchTest
                 {
                     // Только ВТ
                     case 1:
-                        Calculate(_tokensVTList, word, 0.55f);
+                        Calculate(_tokensVTList, word, 0.5f);
                         break;
                     
                     // ВТ + Брэнд
