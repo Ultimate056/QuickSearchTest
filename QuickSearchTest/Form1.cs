@@ -41,7 +41,8 @@ namespace QuickSearchTest
         }
 
         readonly string _connectionString;
-        List<PairToken> _tokensList;
+        List<PairToken> _tokensVTList;
+        List<PairToken> _tokensVTBrandList;
         List<PairToken> _tokensBrandList;
         int _lengthOfToken=3;
         Stopwatch _timer;
@@ -89,9 +90,10 @@ namespace QuickSearchTest
         //Токенезируем все наименования в исходных данных
         private void button1_Click(object sender, EventArgs e)
         {
-            _tokensList = new List<PairToken>();
+            _tokensVTList = new List<PairToken>();
             _tokensBrandList = new List<PairToken>();
-            foreach(DataRow row in rawDataTable.Rows)
+            _tokensVTBrandList = new List<PairToken>();
+            foreach (DataRow row in rawDataTable.Rows)
             {
                 int idTov = Convert.ToInt32(row.ItemArray[3]);
                 string normalizedNameTov = NormalizeString(row.ItemArray[1].ToString());
@@ -102,7 +104,7 @@ namespace QuickSearchTest
                 foreach (var token in tokenByConcatName)
                 {
                     var pair = new PairToken(idTov, token);
-                    _tokensList.Add(pair);
+                    _tokensVTBrandList.Add(pair);
                 }
 
                 List<string> tokenByBrand = TokenizeWord(normalizedBrand);
@@ -113,11 +115,18 @@ namespace QuickSearchTest
                     _tokensBrandList.Add(pair);
                 }
 
+                List<string> tokenByVT = TokenizeWord(normalizedNameTov);
+                foreach (var token in tokenByVT)
+                {
+                    var pair = new PairToken(idTov, token);
+                    _tokensVTList.Add(pair);
+                }
+
             }
 
-            dataGridView2.DataSource = _tokensList.ToArray();
+            dataGridView2.DataSource = _tokensVTBrandList.ToArray();
 
-            label3.Text = $"Общее количество токенов: {_tokensList.Count}";
+            label3.Text = $"Общее количество токенов: {_tokensVTBrandList.Count}";
         }
 
         private string NormalizeString(string str)
@@ -162,96 +171,37 @@ namespace QuickSearchTest
         }
 
 
-        private bool CheckWord(string norm)
-        {
-            int id_start_brand =0 ;
-            int id_end_brand =0;
-            bool f_start_brand = false;
-            bool f_end_brand = false;
-            for (int i = 0; i < norm.Length; i++)
-            {
-                if (!f_start_brand)
-                {
-                    if (norm[i] >= 'a' && norm[i] <= 'z')
-                    {
-                        id_start_brand = i;
-                        f_start_brand = true;
-                    }
-                }
-                else
-                {
-                    if ((norm[i] < 'a' && norm[i] > 'z') || i == norm.Length-1)
-                    {
-                        id_end_brand = i;
-                        f_end_brand = true;
-                        break;
-                    }
-                }
-            }
-
-            return f_start_brand && f_end_brand ? true : false;
-
-            //if(f_start_brand && f_end_brand)
-            //{
-            //    return norm.Substring(id_start_brand, id_end_brand - id_start_brand + 1);
-            //}
-            //else
-            //{
-            //    return "dlskfjsf";
-            //}
-
-        }
-
         //Выполнить поиск по слову из ввода
         private void button2_Click(object sender, EventArgs e)
         {
-            if (_tokensList != null)
+            if (_tokensVTBrandList != null)
             {
                 _timer.Start();
 
-                //Нормализуем ввод и разбиваем его на токены
-                var word = NormalizeString(textBox1.Text);
-                var listOfTokens = TokenizeWord(word);
-                float countTargetTokens = listOfTokens.Count;
+
 
                 // Проверка слова на : только брэнд, вт + брэнд, вт
+                var word = NormalizeString(textBox1.Text);
 
-                float procent = CheckWord(word)? 0.6f : 0.5f;
-
-                //Ищем по существующим токенам пары с токенами из запроса
-                List<PairToken> resultPair = new List<PairToken>();
-                resultPair = _tokensList.Join(listOfTokens, t => t._token, x => x, (t, x) =>
-                                new PairToken(t._idTov, t._token)).Distinct().OrderBy(x=> x._idTov).ToList();
-
-                //Выделяем все Id из обнаруженных пар
-                IEnumerable<int> listOfId = (from id in resultPair
-                                             select id._idTov);
-
-                //Подсчитываем количество совпадений токенов по id
-                var resultMatch = listOfId.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count())
-                    .OrderByDescending(x=> x.Value);
-
-
-                //Выбираем id по максимальному количеству совпадений
-
-                var idMaxMatch = resultMatch.Where(x => x.Value / countTargetTokens >= procent);
-
-
-                //Ищем в датасорсе наименование по id
-
-                List<string> listOfResult = rawDataTable.AsEnumerable()
-                                    .Join(idMaxMatch, dt => Int32.Parse(dt.ItemArray[3].ToString()), id => id.Key,
-                                    
-                                    
-                                    (dt, id) => dt[1].ToString() + " " + dt[2].ToString()).ToList();
-
-                string resultName = listOfResult.FirstOrDefault();
-
-                //Выводим id на форму
-                label1.Text = resultName;
-                listBox1.DataSource = listOfResult;
-
-
+                switch(LogicSearch.CheckWord(word))
+                {
+                    // Только ВТ
+                    case 1:
+                        Calculate(_tokensVTList, word, 0.55f);
+                        break;
+                    
+                    // ВТ + Брэнд
+                    case 2:
+                        Calculate(_tokensVTBrandList, word, 0.65f);
+                        break;
+                    
+                    // Только брэнд
+                    case 3:
+                        Calculate(_tokensBrandList, word, 0.55f);
+                        break;
+                    case 0:
+                        break;
+                }
 
                 _timer.Stop();
 
@@ -262,6 +212,46 @@ namespace QuickSearchTest
             else
                 MessageBox.Show("Сначала надо токенизировать слово");
             
+        }
+
+        private void Calculate(List<PairToken> _tokensList, string word, float procent)
+        {
+            //Нормализуем ввод и разбиваем его на токены
+
+            var listOfTokens = TokenizeWord(word);
+            float countTargetTokens = listOfTokens.Count;
+            //Ищем по существующим токенам пары с токенами из запроса
+            List<PairToken> resultPair = new List<PairToken>();
+            resultPair = _tokensList.Join(listOfTokens, t => t._token, x => x, (t, x) =>
+                            new PairToken(t._idTov, t._token)).Distinct().OrderBy(x => x._idTov).ToList();
+
+            //Выделяем все Id из обнаруженных пар
+            IEnumerable<int> listOfId = (from id in resultPair
+                                         select id._idTov);
+
+            //Подсчитываем количество совпадений токенов по id
+            var resultMatch = listOfId.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count())
+                .OrderByDescending(x => x.Value);
+
+
+            //Выбираем id по максимальному количеству совпадений
+
+            var idMaxMatch = resultMatch.Where(x => x.Value / countTargetTokens >= procent);
+
+
+            //Ищем в датасорсе наименование по id
+
+            List<string> listOfResult = rawDataTable.AsEnumerable()
+                                .Join(idMaxMatch, dt => Int32.Parse(dt.ItemArray[3].ToString()), id => id.Key,
+
+
+                                (dt, id) => dt[1].ToString() + " " + dt[2].ToString()).ToList();
+
+            string resultName = listOfResult.FirstOrDefault();
+
+            //Выводим id на форму
+            label1.Text = resultName;
+            listBox1.DataSource = listOfResult;
         }
 
         private void listBox1_Enter(object sender, EventArgs e)
