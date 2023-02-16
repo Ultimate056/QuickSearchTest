@@ -44,7 +44,7 @@ namespace QuickSearchTest
         List<PairToken> _tokensList;
         int _lengthOfToken=3;
         Stopwatch _timer;
-        
+        DataTable rawDataTable;
 
         public Form1()
         {
@@ -56,22 +56,31 @@ namespace QuickSearchTest
             {
                 connection.Open();
 
-                string Query = @"select  st.id_tov, st.n_tov 
-                                        from spr_tov_level4 l4(nolock)
-										inner join spr_tov st(nolock) on st.id_tov4 =l4.tov_id
-                                        where tov_id_top_level!=0
-                                        order by tov_id_top_level
+                string Query = @"select distinct stl.tov_id idTov, stl.tov_name tovName, brandName FROM spr_tov_level4 stl (nolock)
+                                INNER JOIN (SELECT DISTINCT tov.id_tov4 idTov, brand.tm_name brandName FROM spr_tov tov (nolock) 
+			                                INNER JOIN spr_tm brand (nolock) ON tov.id_tm = brand.tm_id) monstr
+                                ON monstr.idTov = stl.tov_id
+                                where tov_id_top_level <> 0
+                                ORDER BY idTov, brandName
                                         ";
 
                 DataSet ds = new DataSet();
                 SqlDataAdapter da = new SqlDataAdapter(Query, connection);
                 da.SelectCommand.CommandTimeout = 0;
                 da.Fill(ds);
- 
+
+                var dt = ds.Tables[0];
+
+                dt.Columns.Add(new DataColumn("id", typeof(int)));
+                int counter = 1;
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    dt.Rows[i].SetField(dt.Columns["id"], counter++);
+                }
                 dataGridView1.DataSource=  ds.Tables[0];
 
                 connection.Close();
-
+                rawDataTable = (DataTable)dataGridView1.DataSource;
                 _timer = new Stopwatch();
             }
         }
@@ -80,25 +89,21 @@ namespace QuickSearchTest
         private void button1_Click(object sender, EventArgs e)
         {
             _tokensList = new List<PairToken>();
-            DataTable rawDataTable = (DataTable)dataGridView1.DataSource;
-
             foreach(DataRow row in rawDataTable.Rows)
             {
-                int idTov = Convert.ToInt32(row.ItemArray.First());
-                string normalizedNameTov = NormalizeString(row.ItemArray.Last());
-                List<string> tokenByWord = TokenizeWord(normalizedNameTov);
+                int idTov = Convert.ToInt32(row.ItemArray[3]);
+                string normalizedNameTov = NormalizeString(row.ItemArray[1].ToString());
+                string normalizedBrand = NormalizeString(row.ItemArray[2].ToString());
+                string ConcatName = normalizedNameTov + normalizedBrand;
+                List<string> tokenByConcatName= TokenizeWord(ConcatName);
 
-                foreach(var token in tokenByWord)
+                foreach (var token in tokenByConcatName)
                 {
-                    try
-                    {
-                        var pair = new PairToken(idTov, token);
-                        _tokensList.Add(pair);
-                    }
-                    catch(Exception ex)
-                    {
-                    }
+                    var pair = new PairToken(idTov, token);
+                    _tokensList.Add(pair);
                 }
+
+
             }
 
             dataGridView2.DataSource = _tokensList.ToArray();
@@ -106,9 +111,9 @@ namespace QuickSearchTest
             label3.Text = $"Общее количество токенов: {_tokensList.Count}";
         }
 
-        private string NormalizeString(object str)
-        {        
-            string res= str.ToString().Trim().ToLower();
+        private string NormalizeString(string str)
+        {
+            string res = str.ToLower().DeleteSpaces();
             res = DelSymbols(res, 'а', 'я', 'у', 'ю', 'о', 'е', 'ё', 'э', 'и', 'ы','ь','ъ');
             res = DelSymbols(res, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
             return DelSymbols(res, '/', '.', '-', ' ', '\\', '|', '&', '^', '*', ';', ':', '>', '<', ',', '+', '"', '?', '=', '(', ')',' ');
@@ -121,6 +126,8 @@ namespace QuickSearchTest
 
             return s;
         }
+
+       
 
         private List<string> TokenizeWord(string word)
         {
@@ -155,13 +162,12 @@ namespace QuickSearchTest
                 //Нормализуем ввод и разбиваем его на токены
                 var word = NormalizeString(textBox1.Text);
                 var listOfTokens = TokenizeWord(word);
-
+                float procent = 0.6f;
+                float countTargetTokens = listOfTokens.Count;
                 //Ищем по существующим токенам пары с токенами из запроса
                 List<PairToken> resultPair = new List<PairToken>();
-                resultPair = (from t in _tokensList
-                              join l in listOfTokens on t._token equals l
-                              orderby t._idTov
-                              select t).ToList();
+                resultPair = _tokensList.Join(listOfTokens, t => t._token, x => x, (t, x) =>
+                                new PairToken(t._idTov, t._token)).Distinct().OrderBy(x=> x._idTov).ToList();
 
                 //Выделяем все Id из обнаруженных пар
                 IEnumerable<int> listOfId = (from id in resultPair
@@ -172,23 +178,20 @@ namespace QuickSearchTest
 
 
                 //Выбираем id по максимальному количеству совпадений
-                var idMaxMatch = (from m in resultMatch
-                                  orderby m.Value descending
-                                  select m).Take(10);
+
+                var idMaxMatch = resultMatch.OrderByDescending(x => x.Value)
+                                            .Where(x => x.Value / countTargetTokens >= procent);
+
 
                 //Ищем в датасорсе наименование по id
-                DataTable rawDataTable = (DataTable)dataGridView1.DataSource;
-                string resultName = "";
 
-                List<string> listOfResult = (from id in rawDataTable.AsEnumerable()
-                                             join match in idMaxMatch on id.ItemArray.FirstOrDefault().ToString() equals match.Key.ToString()
-                                             select id
-                                                      .ItemArray
-                                                      .LastOrDefault()
-                                                      .ToString())
-                                                           .ToList();
+                List<string> listOfResult = rawDataTable.AsEnumerable()
+                                    .Join(idMaxMatch, dt => Int32.Parse(dt.ItemArray[3].ToString()), id => id.Key,
+                                    
+                                    
+                                    (dt, id) => dt[1].ToString() + " " + dt[2].ToString()).ToList();
 
-                resultName = listOfResult.FirstOrDefault();
+                string resultName = listOfResult.FirstOrDefault();
 
                 //Выводим id на форму
                 label1.Text = resultName;
