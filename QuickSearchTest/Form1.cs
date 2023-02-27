@@ -174,6 +174,7 @@ namespace QuickSearchTest
         //Выполнить поиск по слову из ввода
         private void button2_Click(object sender, EventArgs e)
         {
+            float kf2vers = (float)koeff.Value;
             if (_tokensVTBrandList != null)
             {
                 _timer.Start();
@@ -192,7 +193,7 @@ namespace QuickSearchTest
                     
                     // ВТ + Брэнд
                     case 2:
-                        Calculate(_tokensVTBrandList, word, 0.65f);
+                        Calculate(_tokensVTBrandList, word, kf2vers);
                         break;
                     
                     // Только брэнд
@@ -236,22 +237,30 @@ namespace QuickSearchTest
 
             //Выбираем id по максимальному количеству совпадений
 
-            var idMaxMatch = resultMatch.Where(x => x.Value / countTargetTokens >= procent);
+            var idMaxMatch = resultMatch.Where(x => x.Value / countTargetTokens >= procent).OrderByDescending(x => x.Value)
+                .Take(10);
 
 
             //Ищем в датасорсе наименование по id
 
-            List<string> listOfResult = rawDataTable.AsEnumerable()
-                                .Join(idMaxMatch, dt => Int32.Parse(dt.ItemArray[3].ToString()), id => id.Key,
+            List<string> res = new List<string>(); 
+
+            for(int i = 0; i < idMaxMatch.Count(); i++)
+            {
+                string idPair = idMaxMatch.ToArray()[i].Key.ToString();
+                DataRow dr = rawDataTable.AsEnumerable().Where(x => x.ItemArray[3].ToString() == idPair).FirstOrDefault();
+                if(dr!=null)
+                {
+                    res.Add($"{dr.ItemArray[1]}  {dr.ItemArray[2]}");
+                }
+            }
 
 
-                                (dt, id) => dt[1].ToString() + " " + dt[2].ToString()).ToList();
-
-            string resultName = listOfResult.FirstOrDefault();
+            string resultName = res.FirstOrDefault();
 
             //Выводим id на форму
             label1.Text = resultName;
-            listBox1.DataSource = listOfResult;
+            listBox1.DataSource = res;
         }
 
         private void listBox1_Enter(object sender, EventArgs e)

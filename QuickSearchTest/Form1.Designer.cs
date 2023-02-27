@@ -37,8 +37,10 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.koeff = new DevExpress.XtraEditors.SpinEdit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeff.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
@@ -120,11 +122,36 @@
             this.label3.TabIndex = 8;
             this.label3.Text = "label3";
             // 
+            // koeff
+            // 
+            this.koeff.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.koeff.Location = new System.Drawing.Point(639, 289);
+            this.koeff.Name = "koeff";
+            this.koeff.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.koeff.Properties.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this.koeff.Properties.MaxValue = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.koeff.Size = new System.Drawing.Size(42, 20);
+            this.koeff.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1114, 522);
+            this.Controls.Add(this.koeff);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.listBox1);
@@ -138,6 +165,7 @@
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeff.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -154,6 +182,7 @@
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        public DevExpress.XtraEditors.SpinEdit koeff;
     }
 }
 
