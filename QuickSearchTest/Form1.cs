@@ -43,7 +43,6 @@ namespace QuickSearchTest
         }
 
         readonly string _connectionString;
-        List<PairToken> _tokensVTList;
         List<PairToken> _tokensVTBrandList;
         List<PairToken> _tokensBrandList;
         int _lengthOfToken=3;
@@ -97,7 +96,6 @@ namespace QuickSearchTest
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            _tokensVTList = new List<PairToken>();
             _tokensBrandList = new List<PairToken>();
             _tokensVTBrandList = new List<PairToken>();
             foreach (DataRow row in rawDataTable.Rows)
@@ -128,13 +126,6 @@ namespace QuickSearchTest
                 }
                 // Добавляем сам бренд в список токенов и делаем его приоритетным
                 _tokensBrandList.Add(new PairToken(idTov, normalizedBrand, true));
-
-                List<string> tokenByVT = TokenizeWord(normalizedNameTov);
-                foreach (var token in tokenByVT)
-                {
-                    var pair = new PairToken(idTov, token);
-                    _tokensVTList.Add(pair);
-                }
 
             }
 
@@ -189,7 +180,7 @@ namespace QuickSearchTest
                     string str = word.Substring(i, _lengthOfToken);
                     listOfResult.Add(str);
 
-                    // Перевернутые токены (1 версия, зачем-непонятно)
+                    // Перевернутые токены (старая версия, зачем-непонятно)
 
                     //char[] charArray = str.ToCharArray();
                     //Array.Reverse(charArray);
@@ -210,7 +201,6 @@ namespace QuickSearchTest
         {
             // Настройка коэффициента !
             float kfConcate = (float)koeffConcate.Value;
-            float kfVT = (float)koeffVTOnly.Value;
             float kfBrand = (float)koeffBrandOnly.Value;
 
             if (_tokensVTBrandList != null)
@@ -222,18 +212,13 @@ namespace QuickSearchTest
                 // Алгоритм, определяющий что имел ввиду пользователь
                 switch(LogicSearch.CheckWord(word))
                 {
-                    // Только ВТ
-                    case 1:
-                        Calculate(_tokensVTList, word, kfVT);
-                        break;
-                    
                     // ВТ + Брэнд
-                    case 2:
+                    case 1:
                         Calculate(_tokensVTBrandList, word, kfConcate);
                         break;
                     
                     // Только брэнд
-                    case 3:
+                    case 2:
                         Calculate(_tokensBrandList, word, kfBrand);
                         break;
                     case 0:

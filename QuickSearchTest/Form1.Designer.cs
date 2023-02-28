@@ -39,15 +39,12 @@
             this.koeffConcate = new DevExpress.XtraEditors.SpinEdit();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.koeffVTOnly = new DevExpress.XtraEditors.SpinEdit();
             this.label7 = new System.Windows.Forms.Label();
             this.koeffBrandOnly = new DevExpress.XtraEditors.SpinEdit();
             this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.koeffConcate.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeffVTOnly.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.koeffBrandOnly.Properties)).BeginInit();
             this.SuspendLayout();
             // 
@@ -168,42 +165,6 @@
             this.label5.TabIndex = 11;
             this.label5.Text = "Токены ВТ+Бренд";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(639, 360);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(75, 18);
-            this.label6.TabIndex = 13;
-            this.label6.Text = "Коэф. ВТ";
-            // 
-            // koeffVTOnly
-            // 
-            this.koeffVTOnly.EditValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.koeffVTOnly.Location = new System.Drawing.Point(780, 357);
-            this.koeffVTOnly.Name = "koeffVTOnly";
-            this.koeffVTOnly.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.koeffVTOnly.Properties.Appearance.Options.UseFont = true;
-            this.koeffVTOnly.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.koeffVTOnly.Properties.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.koeffVTOnly.Properties.MaxValue = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.koeffVTOnly.Size = new System.Drawing.Size(58, 24);
-            this.koeffVTOnly.TabIndex = 12;
-            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -256,8 +217,6 @@
             this.ClientSize = new System.Drawing.Size(1114, 522);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.koeffBrandOnly);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.koeffVTOnly);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.koeffConcate);
@@ -275,7 +234,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.koeffConcate.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeffVTOnly.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.koeffBrandOnly.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -295,8 +253,6 @@
         public DevExpress.XtraEditors.SpinEdit koeffConcate;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        public DevExpress.XtraEditors.SpinEdit koeffVTOnly;
         private System.Windows.Forms.Label label7;
         public DevExpress.XtraEditors.SpinEdit koeffBrandOnly;
         private System.Windows.Forms.Label label3;

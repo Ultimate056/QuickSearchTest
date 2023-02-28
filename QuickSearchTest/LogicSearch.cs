@@ -38,11 +38,11 @@ namespace QuickSearchTest
             isVT = counterHitsVT >= 3;
 
             if (isVT && isBrand)
-                result_case = 2;
+                result_case = 1;
             else if (isVT && !isBrand)
                 result_case = 1;
             else if (!isVT && isBrand)
-                result_case = 3;
+                result_case = 2;
             else
                 result_case = 0;
 
