@@ -36,11 +36,19 @@
             this.label1 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.koeffConcate = new DevExpress.XtraEditors.SpinEdit();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.koeffVTOnly = new DevExpress.XtraEditors.SpinEdit();
+            this.label7 = new System.Windows.Forms.Label();
+            this.koeffBrandOnly = new DevExpress.XtraEditors.SpinEdit();
             this.label3 = new System.Windows.Forms.Label();
-            this.koeff = new DevExpress.XtraEditors.SpinEdit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeff.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeffConcate.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeffVTOnly.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeffBrandOnly.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
@@ -71,14 +79,16 @@
             // 
             // textBox1
             // 
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.textBox1.Location = new System.Drawing.Point(23, 254);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(423, 20);
+            this.textBox1.Size = new System.Drawing.Size(423, 24);
             this.textBox1.TabIndex = 3;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(466, 252);
+            this.button2.ForeColor = System.Drawing.Color.Red;
+            this.button2.Location = new System.Drawing.Point(463, 256);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 4;
@@ -113,6 +123,123 @@
             this.label2.TabIndex = 7;
             this.label2.Text = "label2";
             // 
+            // koeffConcate
+            // 
+            this.koeffConcate.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.koeffConcate.Location = new System.Drawing.Point(780, 324);
+            this.koeffConcate.Name = "koeffConcate";
+            this.koeffConcate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.koeffConcate.Properties.Appearance.Options.UseFont = true;
+            this.koeffConcate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.koeffConcate.Properties.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this.koeffConcate.Properties.MaxValue = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.koeffConcate.Size = new System.Drawing.Size(58, 24);
+            this.koeffConcate.TabIndex = 9;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label4.Location = new System.Drawing.Point(639, 327);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(135, 18);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "Коэф. ВТ + Бренд";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(645, 12);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(100, 13);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "Токены ВТ+Бренд";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label6.Location = new System.Drawing.Point(639, 360);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(75, 18);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "Коэф. ВТ";
+            // 
+            // koeffVTOnly
+            // 
+            this.koeffVTOnly.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.koeffVTOnly.Location = new System.Drawing.Point(780, 357);
+            this.koeffVTOnly.Name = "koeffVTOnly";
+            this.koeffVTOnly.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.koeffVTOnly.Properties.Appearance.Options.UseFont = true;
+            this.koeffVTOnly.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.koeffVTOnly.Properties.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this.koeffVTOnly.Properties.MaxValue = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.koeffVTOnly.Size = new System.Drawing.Size(58, 24);
+            this.koeffVTOnly.TabIndex = 12;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label7.Location = new System.Drawing.Point(639, 390);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(99, 18);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "Коэф. Бренд";
+            // 
+            // koeffBrandOnly
+            // 
+            this.koeffBrandOnly.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.koeffBrandOnly.Location = new System.Drawing.Point(780, 387);
+            this.koeffBrandOnly.Name = "koeffBrandOnly";
+            this.koeffBrandOnly.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.koeffBrandOnly.Properties.Appearance.Options.UseFont = true;
+            this.koeffBrandOnly.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.koeffBrandOnly.Properties.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            131072});
+            this.koeffBrandOnly.Properties.MaxValue = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.koeffBrandOnly.Size = new System.Drawing.Size(58, 24);
+            this.koeffBrandOnly.TabIndex = 14;
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -122,36 +249,18 @@
             this.label3.TabIndex = 8;
             this.label3.Text = "label3";
             // 
-            // koeff
-            // 
-            this.koeff.EditValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.koeff.Location = new System.Drawing.Point(639, 289);
-            this.koeff.Name = "koeff";
-            this.koeff.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.koeff.Properties.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.koeff.Properties.MaxValue = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.koeff.Size = new System.Drawing.Size(42, 20);
-            this.koeff.TabIndex = 9;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1114, 522);
-            this.Controls.Add(this.koeff);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.koeffBrandOnly);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.koeffVTOnly);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.koeffConcate);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.listBox1);
@@ -165,7 +274,9 @@
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeff.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeffConcate.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeffVTOnly.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.koeffBrandOnly.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -181,8 +292,14 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label2;
+        public DevExpress.XtraEditors.SpinEdit koeffConcate;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        public DevExpress.XtraEditors.SpinEdit koeffVTOnly;
+        private System.Windows.Forms.Label label7;
+        public DevExpress.XtraEditors.SpinEdit koeffBrandOnly;
         private System.Windows.Forms.Label label3;
-        public DevExpress.XtraEditors.SpinEdit koeff;
     }
 }
 

@@ -20,11 +20,13 @@ namespace QuickSearchTest
 
             public string _token { get; private set; }
 
-            public PairToken(int idTov, string tok)
+            public PairToken(int idTov, string tok, bool priority = false)
             {
                 _idTov = idTov;
                 _token = tok;
+                IsPriority = priority;
             }
+            public bool IsPriority { get; set; } = false;
         }
 
         public class PairMatch
@@ -73,6 +75,7 @@ namespace QuickSearchTest
 
                 var dt = ds.Tables[0];
 
+                // Добавляем в таблицу икусственные айдишники для работы с токенами
                 dt.Columns.Add(new DataColumn("id", typeof(int)));
                 int counter = 1;
                 for (int i = 0; i < dt.Rows.Count; i++)
@@ -87,7 +90,11 @@ namespace QuickSearchTest
             }
         }
 
-        //Токенезируем все наименования в исходных данных
+        /// <summary>
+        /// По нажатию кнопки получаем списки токенов
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             _tokensVTList = new List<PairToken>();
@@ -96,8 +103,11 @@ namespace QuickSearchTest
             foreach (DataRow row in rawDataTable.Rows)
             {
                 int idTov = Convert.ToInt32(row.ItemArray[3]);
-                string normalizedNameTov = NormalizeString(row.ItemArray[1].ToString());
-                string normalizedBrand = NormalizeString(row.ItemArray[2].ToString());
+                string NameTov = row.ItemArray[1].ToString();
+                string Brand = row.ItemArray[2].ToString();
+
+                string normalizedNameTov = NormalizeString(NameTov);
+                string normalizedBrand = NormalizeString(Brand);
                 string ConcatName = normalizedNameTov + normalizedBrand;
                 List<string> tokenByConcatName= TokenizeWord(ConcatName);
 
@@ -106,6 +116,8 @@ namespace QuickSearchTest
                     var pair = new PairToken(idTov, token);
                     _tokensVTBrandList.Add(pair);
                 }
+                // Выделяем полностью бренд как токен
+                _tokensVTBrandList.Add(new PairToken(idTov, normalizedBrand, true));
 
                 List<string> tokenByBrand = TokenizeWord(normalizedBrand);
 
@@ -114,6 +126,8 @@ namespace QuickSearchTest
                     var pair = new PairToken(idTov, token);
                     _tokensBrandList.Add(pair);
                 }
+                // Добавляем сам бренд в список токенов и делаем его приоритетным
+                _tokensBrandList.Add(new PairToken(idTov, normalizedBrand, true));
 
                 List<string> tokenByVT = TokenizeWord(normalizedNameTov);
                 foreach (var token in tokenByVT)
@@ -129,10 +143,19 @@ namespace QuickSearchTest
             label3.Text = $"Общее количество токенов: {_tokensVTBrandList.Count}";
         }
 
-        private string NormalizeString(string str)
+
+        /// <summary>
+        /// Нормализует входную строку
+        /// Optional - false - надо удалять ру буквы, true - не надо
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+
+        private string NormalizeString(string str, bool optional = false)
         {
             string res = str.ToLower().DeleteSpaces();
-            res = DelSymbols(res, 'а', 'я', 'у', 'ю', 'о', 'е', 'ё', 'э', 'и', 'ы','ь','ъ');
+            if(!optional)
+                res = DelSymbols(res, 'а', 'я', 'у', 'ю', 'о', 'е', 'ё', 'э', 'и', 'ы','ь','ъ');
             res = DelSymbols(res, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
             return DelSymbols(res, '/', '.', '-', ' ', '\\', '|', '&', '^', '*', ';', ':', '>', '<', ',', '+', '"', '?', '=', '(', ')',' ');
         }
@@ -146,7 +169,11 @@ namespace QuickSearchTest
         }
 
        
-
+        /// <summary>
+        /// Разбивает слово на токены
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
         private List<string> TokenizeWord(string word)
         {
             var listOfResult = new List<string>();
@@ -161,6 +188,9 @@ namespace QuickSearchTest
                 {
                     string str = word.Substring(i, _lengthOfToken);
                     listOfResult.Add(str);
+
+                    // Перевернутые токены (1 версия, зачем-непонятно)
+
                     //char[] charArray = str.ToCharArray();
                     //Array.Reverse(charArray);
                     //listOfResult.Add(new string(charArray));
@@ -171,34 +201,40 @@ namespace QuickSearchTest
         }
 
 
-        //Выполнить поиск по слову из ввода
+        /// <summary>
+        /// Процедура поиска элемента по вводу пользователем слова
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
-            float kf2vers = (float)koeff.Value;
+            // Настройка коэффициента !
+            float kfConcate = (float)koeffConcate.Value;
+            float kfVT = (float)koeffVTOnly.Value;
+            float kfBrand = (float)koeffBrandOnly.Value;
+
             if (_tokensVTBrandList != null)
             {
                 _timer.Start();
 
-
-
-                // Проверка слова на : только брэнд, вт + брэнд, вт
+                // Нормализация вводной строки
                 var word = NormalizeString(textBox1.Text);
-
+                // Алгоритм, определяющий что имел ввиду пользователь
                 switch(LogicSearch.CheckWord(word))
                 {
                     // Только ВТ
                     case 1:
-                        Calculate(_tokensVTList, word, 0.5f);
+                        Calculate(_tokensVTList, word, kfVT);
                         break;
                     
                     // ВТ + Брэнд
                     case 2:
-                        Calculate(_tokensVTBrandList, word, kf2vers);
+                        Calculate(_tokensVTBrandList, word, kfConcate);
                         break;
                     
                     // Только брэнд
                     case 3:
-                        Calculate(_tokensBrandList, word, 0.55f);
+                        Calculate(_tokensBrandList, word, kfBrand);
                         break;
                     case 0:
                         break;
@@ -211,7 +247,7 @@ namespace QuickSearchTest
                 _timer.Reset();
             }
             else
-                MessageBox.Show("Сначала надо токенизировать слово");
+                MessageBox.Show("Сначала надо токенизировать словарь");
             
         }
 
@@ -220,41 +256,85 @@ namespace QuickSearchTest
             //Нормализуем ввод и разбиваем его на токены
 
             var listOfTokens = TokenizeWord(word);
+            // Добавляем бренд
+            if (LogicSearch.Brand != null)
+                listOfTokens.Add(LogicSearch.Brand);
             float countTargetTokens = listOfTokens.Count;
             //Ищем по существующим токенам пары с токенами из запроса
             List<PairToken> resultPair = new List<PairToken>();
             resultPair = _tokensList.Join(listOfTokens, t => t._token, x => x, (t, x) =>
-                            new PairToken(t._idTov, t._token)).Distinct().OrderBy(x => x._idTov).ToList();
+                            new PairToken(t._idTov, t._token, t.IsPriority))
+                            .Distinct().OrderBy(x => x._idTov).ToList();
+
 
             //Выделяем все Id из обнаруженных пар
-            IEnumerable<int> listOfId = (from id in resultPair
-                                         select id._idTov);
+            IEnumerable<int> listOfId = resultPair
+                            .Select(x => x._idTov);
+
+            bool isHavePriority = false;
+            IEnumerable<int> listOfPriorityId = new List<int>();
+            Dictionary<int, int> resultPriorityMatch = null;
+            IEnumerable<int> idPriorityMaxMatch = null;
+
+
+
+            listOfPriorityId = resultPair
+                .Where(x => x.IsPriority == true).Select(x => x._idTov);
+            if (listOfPriorityId.Count() > 0)
+                isHavePriority = true;
 
             //Подсчитываем количество совпадений токенов по id
-            var resultMatch = listOfId.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count())
-                .OrderByDescending(x => x.Value);
+            Dictionary<int,int> resultMatch = listOfId.GroupBy(x => x).
+                ToDictionary(x => x.Key, x => x.Count());
 
+            // Подсчитываем количество совпадений по приоритетным полям
+            if (isHavePriority)
+            {
+                resultPriorityMatch = listOfPriorityId.GroupBy(x => x).
+                ToDictionary(x => x.Key, x => x.Count());
+            }
 
             //Выбираем id по максимальному количеству совпадений
 
-            var idMaxMatch = resultMatch.Where(x => x.Value / countTargetTokens >= procent).OrderByDescending(x => x.Value)
+            IEnumerable<int> idMaxMatch = resultMatch
+                .Where(x => x.Value / countTargetTokens >= procent)
+                .OrderByDescending(x => x.Value)
+                .Select(x => x.Key)
                 .Take(10);
+
+            // Выбираем id по количеству совпадений приоритетов
+            if(isHavePriority)
+            {
+                idPriorityMaxMatch = resultPriorityMatch
+                .OrderByDescending(x => x.Value)
+                .Select(x=> x.Key) ;
+            }
+
+            IEnumerable<int> finalMaxMatch = null;
+            if (isHavePriority)
+            {
+                finalMaxMatch = idMaxMatch.Intersect(idPriorityMaxMatch);
+            }
+            else
+            {
+                finalMaxMatch = idMaxMatch;
+            }
 
 
             //Ищем в датасорсе наименование по id
 
             List<string> res = new List<string>(); 
 
-            for(int i = 0; i < idMaxMatch.Count(); i++)
+            foreach(var item in finalMaxMatch)
             {
-                string idPair = idMaxMatch.ToArray()[i].Key.ToString();
-                DataRow dr = rawDataTable.AsEnumerable().Where(x => x.ItemArray[3].ToString() == idPair).FirstOrDefault();
-                if(dr!=null)
+                DataRow dr = rawDataTable.AsEnumerable()
+                    .Where(x => x.ItemArray[3].ToString() == item.ToString())
+                    .FirstOrDefault();
+                if (dr != null)
                 {
                     res.Add($"{dr.ItemArray[1]}  {dr.ItemArray[2]}");
                 }
             }
-
 
             string resultName = res.FirstOrDefault();
 
