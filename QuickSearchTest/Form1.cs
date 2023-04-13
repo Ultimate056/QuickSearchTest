@@ -54,7 +54,7 @@ namespace QuickSearchTest
             InitializeComponent();
 
             //Заполняем табличку на форме видами товара
-            _connectionString = @"Server=DBSRV\DBSRV;Database=test;Integrated Security=SSPI;Connect Timeout=600";
+            _connectionString = @"Server=DBSRV\DBSRV;Database=clon;Integrated Security=SSPI;Connect Timeout=600";
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
@@ -332,6 +332,11 @@ namespace QuickSearchTest
         {
             var item= listBox1.SelectedItem.ToString();
             textBox1.Text = item;
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
