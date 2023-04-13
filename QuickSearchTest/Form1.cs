@@ -9,334 +9,240 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using QuickSearchTest.Models;
+using QuickSearchTest.Database;
+using System.Threading;
 
 namespace QuickSearchTest
 {
     public partial class Form1 : Form
     {
-        public class PairToken
-        {
-            public int _idTov { get; private set; }
-
-            public string _token { get; private set; }
-
-            public PairToken(int idTov, string tok, bool priority = false)
-            {
-                _idTov = idTov;
-                _token = tok;
-                IsPriority = priority;
-            }
-            public bool IsPriority { get; set; } = false;
-        }
-
-        public class PairMatch
-        {
-            public int _idTov { get; private set; }
-
-            public int _count { get; private set; }
-
-            public PairMatch(int idTov, int count)
-            {
-                _idTov = idTov;
-                _count = count;
-            }
-        }
-
-        readonly string _connectionString;
-        List<PairToken> _tokensVTBrandList;
-        List<PairToken> _tokensBrandList;
-        int _lengthOfToken=3;
-        Stopwatch _timer;
-        DataTable rawDataTable;
+        
+        private Stopwatch timer = new Stopwatch();
+        private string sql;
 
         public Form1()
         {
             InitializeComponent();
 
-            //Заполняем табличку на форме видами товара
-            _connectionString = @"Server=DBSRV\DBSRV;Database=clon;Integrated Security=SSPI;Connect Timeout=600";
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
+            Cursor.Current = Cursors.WaitCursor;
+            fillgcUsku();
+            generateTokens();
 
-                string Query = @"select distinct stl.tov_id idTov, stl.tov_name tovName, brandName FROM spr_tov_level4 stl (nolock)
-                                INNER JOIN (SELECT DISTINCT tov.id_tov4 idTov, brand.tm_name brandName FROM spr_tov tov (nolock) 
-			                                INNER JOIN spr_tm brand (nolock) ON tov.id_tm = brand.tm_id) monstr
-                                ON monstr.idTov = stl.tov_id
-                                where tov_id_top_level <> 0
-                                ORDER BY idTov, brandName
-                                        ";
+            Cursor.Current = Cursors.Default;
 
-                DataSet ds = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(Query, connection);
-                da.SelectCommand.CommandTimeout = 0;
-                da.Fill(ds);
-
-                var dt = ds.Tables[0];
-
-                // Добавляем в таблицу икусственные айдишники для работы с токенами
-                dt.Columns.Add(new DataColumn("id", typeof(int)));
-                int counter = 1;
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    dt.Rows[i].SetField(dt.Columns["id"], counter++);
-                }
-                dataGridView1.DataSource=  ds.Tables[0];
-
-                connection.Close();
-                rawDataTable = (DataTable)dataGridView1.DataSource;
-                _timer = new Stopwatch();
-            }
         }
 
-        /// <summary>
-        /// По нажатию кнопки получаем списки токенов
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private SqlParameter sp(string key, object value) => new SqlParameter(key, value);
+
+        private int parse(object value) => Convert.ToInt32(value);
+
+
+
+        private void fillgcUsku()
         {
-            _tokensBrandList = new List<PairToken>();
-            _tokensVTBrandList = new List<PairToken>();
-            foreach (DataRow row in rawDataTable.Rows)
-            {
-                int idTov = Convert.ToInt32(row.ItemArray[3]);
-                string NameTov = row.ItemArray[1].ToString();
-                string Brand = row.ItemArray[2].ToString();
-
-                string normalizedNameTov = NormalizeString(NameTov);
-                string normalizedBrand = NormalizeString(Brand);
-                string ConcatName = normalizedNameTov + normalizedBrand;
-                List<string> tokenByConcatName= TokenizeWord(ConcatName);
-
-                foreach (var token in tokenByConcatName)
-                {
-                    var pair = new PairToken(idTov, token);
-                    _tokensVTBrandList.Add(pair);
-                }
-                // Выделяем полностью бренд как токен
-                _tokensVTBrandList.Add(new PairToken(idTov, normalizedBrand, true));
-
-                List<string> tokenByBrand = TokenizeWord(normalizedBrand);
-
-                foreach (var token in tokenByBrand)
-                {
-                    var pair = new PairToken(idTov, token);
-                    _tokensBrandList.Add(pair);
-                }
-                // Добавляем сам бренд в список токенов и делаем его приоритетным
-                _tokensBrandList.Add(new PairToken(idTov, normalizedBrand, true));
-
-            }
-
-            dataGridView2.DataSource = _tokensVTBrandList.ToArray();
-
-            label3.Text = $"Общее количество токенов: {_tokensVTBrandList.Count}";
+            sql = @"select distinct
+                     rUSKU.idusku as idusku, 
+                    (select nameusku from dbo.f_getuskuname(rUSKU.idusku)) nameusku
+                     from rUSKU(nolock)";
+            gcUsku.DataSource = DBExecute.SelectTable(sql);
         }
 
 
-        /// <summary>
-        /// Нормализует входную строку
-        /// Optional - false - надо удалять ру буквы, true - не надо
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
+        List<PairToken> tokens = new List<PairToken>();
+        List<string> SearchValueTokens;
+        List<DataRow> rowsUSKU => (gcUsku.DataSource as DataTable).AsEnumerable()
+                .ToList();
 
-        private string NormalizeString(string str, bool optional = false)
+        private void generateTokens()
         {
-            string res = str.ToLower().DeleteSpaces();
-            if(!optional)
-                res = DelSymbols(res, 'а', 'я', 'у', 'ю', 'о', 'е', 'ё', 'э', 'и', 'ы','ь','ъ');
-            res = DelSymbols(res, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
-            return DelSymbols(res, '/', '.', '-', ' ', '\\', '|', '&', '^', '*', ';', ':', '>', '<', ',', '+', '"', '?', '=', '(', ')',' ');
-        }
+            DataTable genTokens = new DataTable();
+            genTokens.Columns.Add("idToken");
+            genTokens.Columns.Add("valueToken");
+            genTokens.Columns.Add("idUSKU");
+            genTokens.Columns.Add("isPriority");
+            genTokens.Columns["idToken"].AutoIncrement = true;
+            genTokens.Columns["idToken"].Caption = "ID токена";
+            genTokens.Columns["valueToken"].Caption = "Токен";
 
-        private string DelSymbols(string s, params char[] par)
-        {
-            foreach (var p in par)
-                s = s.Replace(p.ToString(), "");
-
-            return s;
-        }
-
-       
-        /// <summary>
-        /// Разбивает слово на токены
-        /// </summary>
-        /// <param name="word"></param>
-        /// <returns></returns>
-        private List<string> TokenizeWord(string word)
-        {
-            var listOfResult = new List<string>();
-
-            if (word.ToArray().Length <= _lengthOfToken)
+            try
             {
-                listOfResult.Add(word);
-            }
-            else
-            {
-                for(int i=0; i< word.ToArray().Length-_lengthOfToken+1;i++)
+                int counter = 0;
+                foreach (DataRow dr in rowsUSKU)
                 {
-                    string str = word.Substring(i, _lengthOfToken);
-                    listOfResult.Add(str);
-
-                    // Перевернутые токены (старая версия, зачем-непонятно)
-
-                    //char[] charArray = str.ToCharArray();
-                    //Array.Reverse(charArray);
-                    //listOfResult.Add(new string(charArray));
-                }
-            }
-
-            return listOfResult;
-        }
-
-
-        /// <summary>
-        /// Процедура поиска элемента по вводу пользователем слова
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button2_Click(object sender, EventArgs e)
-        {
-            // Настройка коэффициента !
-            float kfConcate = (float)koeffConcate.Value;
-            float kfBrand = (float)koeffBrandOnly.Value;
-
-            if (_tokensVTBrandList != null)
-            {
-                _timer.Start();
-
-                // Нормализация вводной строки
-                var word = NormalizeString(textBox1.Text);
-                // Алгоритм, определяющий что имел ввиду пользователь
-                switch(LogicSearch.CheckWord(word))
-                {
-                    // ВТ + Брэнд
-                    case 1:
-                        Calculate(_tokensVTBrandList, word, kfConcate);
-                        break;
-                    
-                    // Только брэнд
-                    case 2:
-                        Calculate(_tokensBrandList, word, kfBrand);
-                        break;
-                    case 0:
-                        break;
+                    List<string> words = LogicSearch.NormalizeString(dr["nameusku"].ToString());
+                    int idusku = parse(dr["idusku"]);
+                    foreach (string word in words)
+                    {
+                        Dictionary<string, bool> valueTokens = LogicSearch.TokenizeWord(word);
+                        foreach (var token in valueTokens)
+                        {
+                            genTokens.Rows.Add(++counter, token.Key, idusku, token.Value);
+                        }
+                    }
                 }
 
-                _timer.Stop();
 
-                TimeSpan timeTaken = _timer.Elapsed;
-                label2.Text = "Time taken: " + timeTaken.ToString(@"m\:ss\.fff");
-                _timer.Reset();
+                List<DataRow> rowsToken = genTokens.AsEnumerable().ToList();
+                foreach (DataRow dr in rowsToken)
+                {
+                    tokens.Add(new PairToken
+                    {
+                        idToken = parse(dr["idToken"]),
+                        idUSKU = parse(dr["idUSKU"]),
+                        IsPriority = Convert.ToBoolean(dr["isPriority"]),
+                        Value = dr["valueToken"].ToString()
+                    });
+                }
+
+
+                gcToken.DataSource = genTokens;
             }
-            else
-                MessageBox.Show("Сначала надо токенизировать словарь");
-            
+            catch(Exception ex)
+            {
+                MessageBox.Show("Ошибка. " + ex.Message);
+            }
+     
         }
 
-        private void Calculate(List<PairToken> _tokensList, string word, float procent)
+
+
+        private void SearchButton_Click(object sender, EventArgs e)
         {
-            //Нормализуем ввод и разбиваем его на токены
-
-            var listOfTokens = TokenizeWord(word);
-            // Добавляем бренд
-            if (LogicSearch.Brand != null)
-                listOfTokens.Add(LogicSearch.Brand);
-            float countTargetTokens = listOfTokens.Count;
-            //Ищем по существующим токенам пары с токенами из запроса
-            List<PairToken> resultPair = new List<PairToken>();
-            resultPair = _tokensList.Join(listOfTokens, t => t._token, x => x, (t, x) =>
-                            new PairToken(t._idTov, t._token, t.IsPriority))
-                            .Distinct().OrderBy(x => x._idTov).ToList();
-
-
-            //Выделяем все Id из обнаруженных пар
-            IEnumerable<int> listOfId = resultPair
-                            .Select(x => x._idTov);
-
-            bool isHavePriority = false;
-            IEnumerable<int> listOfPriorityId = new List<int>();
-            Dictionary<int, int> resultPriorityMatch = null;
-            IEnumerable<int> idPriorityMaxMatch = null;
-
-
-
-            listOfPriorityId = resultPair
-                .Where(x => x.IsPriority == true).Select(x => x._idTov);
-            if (listOfPriorityId.Count() > 0)
-                isHavePriority = true;
-
-            //Подсчитываем количество совпадений токенов по id
-            Dictionary<int,int> resultMatch = listOfId.GroupBy(x => x).
-                ToDictionary(x => x.Key, x => x.Count());
-
-            // Подсчитываем количество совпадений по приоритетным полям
-            if (isHavePriority)
-            {
-                resultPriorityMatch = listOfPriorityId.GroupBy(x => x).
-                ToDictionary(x => x.Key, x => x.Count());
-            }
-
-            //Выбираем id по максимальному количеству совпадений
-
-            IEnumerable<int> idMaxMatch = resultMatch
-                .Where(x => x.Value / countTargetTokens >= procent)
-                .OrderByDescending(x => x.Value)
-                .Select(x => x.Key)
-                .Take(10);
-
-            // Выбираем id по количеству совпадений приоритетов
-            if(isHavePriority)
-            {
-                idPriorityMaxMatch = resultPriorityMatch
-                .OrderByDescending(x => x.Value)
-                .Select(x=> x.Key) ;
-            }
-
-            IEnumerable<int> finalMaxMatch = null;
-            if (isHavePriority)
-            {
-                finalMaxMatch = idMaxMatch.Intersect(idPriorityMaxMatch);
-            }
-            else
-            {
-                finalMaxMatch = idMaxMatch;
-            }
-
-
-            //Ищем в датасорсе наименование по id
-
-            List<string> res = new List<string>(); 
-
-            foreach(var item in finalMaxMatch)
-            {
-                DataRow dr = rawDataTable.AsEnumerable()
-                    .Where(x => x.ItemArray[3].ToString() == item.ToString())
-                    .FirstOrDefault();
-                if (dr != null)
+            timer.Start();
+            listBoxControl1.DataSource = null;
+            gcResults.DataSource = null;
+            #region Формируем токены введенных слов
+            SearchValueTokens = new List<string>();
+            string searchWord = SearchWordEdit.EditValue.ToString();
+            List<string> words = LogicSearch.NormalizeString(searchWord);
+            foreach(var word in words)
+            { 
+                Dictionary<string, bool> valueTokens = LogicSearch.TokenizeWord(word, true);
+                foreach(var token in valueTokens)
                 {
-                    res.Add($"{dr.ItemArray[1]}  {dr.ItemArray[2]}");
+                    SearchValueTokens.Add(token.Key);
                 }
             }
+            #endregion
 
-            string resultName = res.FirstOrDefault();
+            int searchCountTokens = SearchValueTokens.Count;
 
-            //Выводим id на форму
-            label1.Text = resultName;
-            listBox1.DataSource = res;
+            // Выбираем обнаруженные токены
+            List<PairToken> findTokens = tokens.Join(SearchValueTokens, x => x.Value, j => j,
+                (x, j) => new PairToken { idToken = x.idToken, idUSKU = x.idUSKU, IsPriority = x.IsPriority, Value = x.Value})
+                .Distinct().ToList() ;
+
+            // Выбираем кол-во найденных USKU из обнаруженных
+            IEnumerable<int> listOfUsku = findTokens
+                            .Select(x => x.idUSKU);
+
+
+            var matches = listOfUsku.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count())
+                .Select(x=> new PairMatch { idUSKU = x.Key, count = x.Value }).OrderByDescending(x=> x.count).ToList();
+
+            List<PairMatch> top = matches.Take(5).ToList();
+
+            if(top == null)
+            {
+                MessageBox.Show("Ничего не найдено");
+                timer.Stop(); timer.Reset();
+                return;
+            }
+
+            List<string> res = top.Join(rowsUSKU, x => x.idUSKU,
+                j => parse(j["idusku"]), (x, j) => j["nameusku"].ToString()).ToList();
+
+
+            listBoxControl1.DataSource = res;
+
+            timer.Stop();
+
+            timeSearchLabel.Text = "Время поиска " + timer.Elapsed.ToString(@"m\:ss\.fff");
+            timer.Reset();
         }
 
-        private void listBox1_Enter(object sender, EventArgs e)
+        private void listBoxControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var item= listBox1.SelectedItem.ToString();
-            textBox1.Text = item;
+            if (listBoxControl1.SelectedValue == null)
+                return;
+
+            DataRow tmp = rowsUSKU.Where(x => x["nameusku"].Equals(listBoxControl1.SelectedValue.ToString())).FirstOrDefault();
+            if (tmp == null)
+                return;
+
+            int idSelUsku = parse(tmp["idusku"]);
+
+
+            sql = @"SELECT rel.idtov as idtov, spr_tov_level4.tov_name as vidtov,
+                     spr_tm.tm_name as brand, spr_tov.id_tov_oem as articul, spr_tov.n_tov as skuName FROM rLinkSKUwithUSKU as rel (nolock)
+                     INNER JOIN spr_tov (nolock) ON spr_tov.id_tov = rel.idtov
+                     INNER JOIN spr_tm (nolock) ON spr_tm.tm_id = spr_tov.id_tm
+                     INNER JOIN spr_tov_level4 ON spr_tov_level4.tov_id = spr_tov.id_tov4
+                     WHERE idUSKU = @idusku";
+            var p_usku = sp("idusku", idSelUsku);
+            gcResults.DataSource = DBExecute.SelectTable(sql, p_usku);
         }
 
-        private void label3_Click(object sender, EventArgs e)
+        private void SearchWordEdit_EditValueChanged(object sender, EventArgs e)
         {
 
+            timer.Start();
+            listBoxControl1.DataSource = null;
+            gcResults.DataSource = null;
+            #region Формируем токены введенных слов
+            SearchValueTokens = new List<string>();
+            string searchWord = SearchWordEdit.EditValue.ToString();
+            List<string> words = LogicSearch.NormalizeString(searchWord);
+            foreach (var word in words)
+            {
+                Dictionary<string, bool> valueTokens = LogicSearch.TokenizeWord(word, true);
+                foreach (var token in valueTokens)
+                {
+                    SearchValueTokens.Add(token.Key);
+                }
+            }
+            #endregion
+
+            int searchCountTokens = SearchValueTokens.Count;
+
+            // Выбираем обнаруженные токены
+            List<PairToken> findTokens = tokens.Join(SearchValueTokens, x => x.Value, j => j,
+                (x, j) => new PairToken { idToken = x.idToken, idUSKU = x.idUSKU, IsPriority = x.IsPriority, Value = x.Value })
+                .Distinct().ToList();
+
+            // Выбираем кол-во найденных USKU из обнаруженных
+            IEnumerable<int> listOfUsku = findTokens
+                            .Select(x => x.idUSKU);
+
+
+            var matches = listOfUsku.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count())
+                .Select(x => new PairMatch { idUSKU = x.Key, count = x.Value }).OrderByDescending(x => x.count).ToList();
+
+            List<PairMatch> top = matches.Take(5).ToList();
+
+            if (top == null)
+            {
+                MessageBox.Show("Ничего не найдено");
+                timer.Stop(); timer.Reset();
+                return;
+            }
+
+            List<string> res = top.Join(rowsUSKU, x => x.idUSKU,
+                j => parse(j["idusku"]), (x, j) => j["nameusku"].ToString()).ToList();
+
+
+            listBoxControl1.DataSource = res;
+
+            timer.Stop();
+
+            timeSearchLabel.Text = "Время поиска " + timer.Elapsed.ToString(@"m\:ss\.fff");
+            timer.Reset();
+        }
+
+        private void SearchWordEdit_EditValueChanging(object sender, DevExpress.XtraEditors.Controls.ChangingEventArgs e)
+        {
+            Thread.Sleep(10);
         }
     }
 }

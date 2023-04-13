@@ -11,106 +11,107 @@ namespace QuickSearchTest
     /// </summary>
     public static class LogicSearch
     {
-        public static string Brand = null;
-        public static int CheckWord(string norm)
-        {
-            int result_case = 0;
-            bool isVT = false;
-            bool isBrand = false;
+       
+        private static readonly char[] RULetters = { 'а', 'я', 'у', 'ю', 'о', 'е', 'ё', 'э', 'и', 'ы', 'ь', 'ъ' };
+        private static readonly char[] Numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        private static readonly char[] Special = { '/', '.', '-', ' ', '\\', '|', '&', '^', '*', ';', ':', '>', '<', ',', '+', '"', '?', '=', '(', ')', ' ' };
 
-            int counterHitsVT = 0;
-            // Берем массив чаров
-            for (int i = 0; i < norm.Length; i++)
+        public static List<string> NormalizeString(string str, bool optional = false)
+        {
+            // Разбиваем U-SKU по пробелам
+            List<string> result = new List<string>();
+            string mainStr = str.ToLower();
+
+            string[] subStr = mainStr.Trim().Split(' ');
+            if(subStr.Length > 0)
             {
-                // Предполагаем, что если введены русские буквы, значит он вписал вид товара
-                if (norm[i] >= 'а' && norm[i] <= 'я')
+                for (int i = 0; i < subStr.Length; i++)
                 {
-                    isVT = true;
-                    counterHitsVT++;
+                    string subValue = DelSymbols(subStr[i], Special);
+                    subValue = DelSymbols(subValue, RULetters);
+
+                    result.Add(subValue);
                 }
             }
-
-            Brand = ExtractBrand(norm);
-            if (Brand != null)
-            {
-                isBrand = true;
-            }
-            isVT = counterHitsVT >= 3;
-
-            if (isVT && isBrand)
-                result_case = 1;
-            else if (isVT && !isBrand)
-                result_case = 1;
-            else if (!isVT && isBrand)
-                result_case = 2;
             else
-                result_case = 0;
+            {
+                string subValue = DelSymbols(str, Special);
+                subValue = DelSymbols(subValue, RULetters);
+                result.Add(subValue);
+            }
 
-            return result_case;
+
+
+            return result;
         }
+
+        public static string DelSymbols(string s, char[] symbols, params char[] parOptional)
+        {
+            foreach (var symbol in symbols)
+                s = s.Replace(symbol.ToString(), "");
+
+
+            if (parOptional.Length > 0)
+            {
+                foreach (var p in parOptional)
+                    s = s.Replace(p.ToString(), "");
+            }
+
+
+            return s;
+        }
+
 
         /// <summary>
-        /// Извлекаем брэнд если есть
+        /// Разбивает слово на токены
         /// </summary>
-        /// <param name="norm"></param>
+        /// <param name="word"></param>
         /// <returns></returns>
-        public static string ExtractBrand(string norm)
+        public static Dictionary<string, bool> TokenizeWord(string word, bool optional = false)
         {
-            string res = null;
-            int id_start_brand = 0;
-            int id_end_brand = 0;
-            bool f_start_brand = false;
-            bool f_end_brand = false;
-            int countSuitSymbols = 0;
-            for (int i = 0; i < norm.Length; i++)
+            var listResult = new Dictionary<string, bool>();
+
+            if (word.ToArray().Length <= Program.lengthToken)
             {
-                // Если бренда нет
-                if (!f_start_brand)
+                listResult.Add(word, true);
+            }
+            else
+            {
+
+                int le = Program.lengthToken;
+                int wle = word.Length;
+                if (optional)
                 {
-                    // Проверяем есть ли латинские буквы, если есть предполагаем что начался бренд
-                    if (norm[i] >= 'a' && norm[i] <= 'z')
+                    for (int i = 0; i < wle; i++)
                     {
-                        id_start_brand = i;
-                        f_start_brand = true;
+                        if (le <= wle - i)
+                        {
+                            string str1 = word.Substring(i, le);
+                            listResult.Add(str1, false);
+                        }
+                        if (le - 1 <= wle - i)
+                        {
+                            string str2 = word.Substring(i, le - 1);
+                            listResult.Add(str2, false);
+                        }
                     }
                 }
-                // Иначе если бренд начался
                 else
                 {
-                    // Если последний символ в слове
-                    if (i == norm.Length - 1)
+                    for (int i = 0; i < wle; i++)
                     {
-                        // Проверяем латинский символ или нет
-                        if ((norm[i] >= 'a' && norm[i] <= 'z'))
+                        if (le <= wle - i)
                         {
-                            id_end_brand = i;
-                            // Если количество лат.символов подряд > 2 , то это бренд
-                            countSuitSymbols = id_end_brand - id_start_brand + 1;
-                            f_end_brand = countSuitSymbols >= 2;
-                        }
-                    }
-                    // Если не последний символ в слове
-                    else
-                    {
-                        // Проверяем: нелатинский символ
-                        if (!(norm[i] >= 'a' && norm[i] <= 'z'))
-                        {
-                            id_end_brand = i - 1;
-                            countSuitSymbols = id_end_brand - id_start_brand + 1;
-                            f_end_brand = countSuitSymbols >= 2;
-                            break;
+                            string str1 = word.Substring(i, le);
+                            listResult.Add(str1, false);
                         }
                     }
                 }
-            }
-            if(f_start_brand && f_end_brand)
-            {
-                res = norm.Substring(id_start_brand, countSuitSymbols);
+
             }
 
-            return res;
+            return listResult;
         }
-
 
     }
 }

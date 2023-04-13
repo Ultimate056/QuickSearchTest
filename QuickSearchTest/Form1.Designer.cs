@@ -28,273 +28,206 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            this.gcUsku = new DevExpress.XtraGrid.GridControl();
+            this.gvUsku = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.gcToken = new DevExpress.XtraGrid.GridControl();
+            this.gvToken = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.label1 = new System.Windows.Forms.Label();
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.koeffConcate = new DevExpress.XtraEditors.SpinEdit();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.koeffBrandOnly = new DevExpress.XtraEditors.SpinEdit();
-            this.label3 = new System.Windows.Forms.Label();
-            this.dataGridView3 = new System.Windows.Forms.DataGridView();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeffConcate.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeffBrandOnly.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).BeginInit();
+            this.SearchWordEdit = new DevExpress.XtraEditors.TextEdit();
+            this.SearchButton = new DevExpress.XtraEditors.SimpleButton();
+            this.gcResults = new DevExpress.XtraGrid.GridControl();
+            this.gvResults = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.timeSearchLabel = new System.Windows.Forms.Label();
+            this.listBoxControl1 = new DevExpress.XtraEditors.ListBoxControl();
+            this.searchControl1 = new DevExpress.XtraEditors.SearchControl();
+            this.searchControl2 = new DevExpress.XtraEditors.SearchControl();
+            ((System.ComponentModel.ISupportInitialize)(this.gcUsku)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvUsku)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gcToken)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvToken)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SearchWordEdit.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gcResults)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvResults)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.listBoxControl1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchControl1.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchControl2.Properties)).BeginInit();
             this.SuspendLayout();
             // 
-            // dataGridView1
+            // gcUsku
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(22, 12);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(584, 223);
-            this.dataGridView1.TabIndex = 0;
+            this.gcUsku.Location = new System.Drawing.Point(77, 61);
+            this.gcUsku.MainView = this.gvUsku;
+            this.gcUsku.Name = "gcUsku";
+            this.gcUsku.Size = new System.Drawing.Size(400, 360);
+            this.gcUsku.TabIndex = 18;
+            this.gcUsku.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gvUsku});
             // 
-            // dataGridView2
+            // gvUsku
             // 
-            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Location = new System.Drawing.Point(1054, 12);
-            this.dataGridView2.Name = "dataGridView2";
-            this.dataGridView2.Size = new System.Drawing.Size(455, 303);
-            this.dataGridView2.TabIndex = 1;
+            this.gvUsku.GridControl = this.gcUsku;
+            this.gvUsku.Name = "gvUsku";
             // 
-            // button1
+            // gcToken
             // 
-            this.button1.Location = new System.Drawing.Point(942, 39);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(106, 31);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Токенезировать";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.gcToken.Location = new System.Drawing.Point(591, 61);
+            this.gcToken.MainView = this.gvToken;
+            this.gcToken.Name = "gcToken";
+            this.gcToken.Size = new System.Drawing.Size(533, 360);
+            this.gcToken.TabIndex = 19;
+            this.gcToken.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gvToken});
             // 
-            // textBox1
+            // gvToken
             // 
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBox1.Location = new System.Drawing.Point(23, 254);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(423, 24);
-            this.textBox1.TabIndex = 3;
-            // 
-            // button2
-            // 
-            this.button2.ForeColor = System.Drawing.Color.Red;
-            this.button2.Location = new System.Drawing.Point(463, 256);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "Search";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.gvToken.GridControl = this.gcToken;
+            this.gvToken.Name = "gvToken";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(20, 289);
+            this.label1.Location = new System.Drawing.Point(817, 45);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "label1";
-            // 
-            // listBox1
-            // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(22, 327);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(584, 186);
-            this.listBox1.TabIndex = 6;
-            this.listBox1.Enter += new System.EventHandler(this.listBox1_Enter);
+            this.label1.Size = new System.Drawing.Size(97, 13);
+            this.label1.TabIndex = 21;
+            this.label1.Text = "Токены по U-SKU";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(19, 302);
+            this.label2.Location = new System.Drawing.Point(213, 45);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(35, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "label2";
+            this.label2.Size = new System.Drawing.Size(40, 13);
+            this.label2.TabIndex = 22;
+            this.label2.Text = "U-SKU";
             // 
-            // koeffConcate
+            // SearchWordEdit
             // 
-            this.koeffConcate.EditValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.koeffConcate.Location = new System.Drawing.Point(780, 324);
-            this.koeffConcate.Name = "koeffConcate";
-            this.koeffConcate.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.koeffConcate.Properties.Appearance.Options.UseFont = true;
-            this.koeffConcate.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.koeffConcate.Properties.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.koeffConcate.Properties.MaxValue = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.koeffConcate.Size = new System.Drawing.Size(58, 24);
-            this.koeffConcate.TabIndex = 9;
+            this.SearchWordEdit.Location = new System.Drawing.Point(426, 452);
+            this.SearchWordEdit.Name = "SearchWordEdit";
+            this.SearchWordEdit.Properties.Appearance.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.SearchWordEdit.Properties.Appearance.Options.UseFont = true;
+            this.SearchWordEdit.Size = new System.Drawing.Size(224, 26);
+            this.SearchWordEdit.TabIndex = 25;
+            this.SearchWordEdit.EditValueChanged += new System.EventHandler(this.SearchWordEdit_EditValueChanged);
+            this.SearchWordEdit.EditValueChanging += new DevExpress.XtraEditors.Controls.ChangingEventHandler(this.SearchWordEdit_EditValueChanging);
             // 
-            // label4
+            // SearchButton
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(639, 327);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(135, 18);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "Коэф. ВТ + Бренд";
+            this.SearchButton.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("SearchButton.ImageOptions.Image")));
+            this.SearchButton.Location = new System.Drawing.Point(526, 484);
+            this.SearchButton.Name = "SearchButton";
+            this.SearchButton.Size = new System.Drawing.Size(39, 35);
+            this.SearchButton.TabIndex = 26;
+            this.SearchButton.Click += new System.EventHandler(this.SearchButton_Click);
             // 
-            // label5
+            // gcResults
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(948, 12);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(100, 13);
-            this.label5.TabIndex = 11;
-            this.label5.Text = "Токены ВТ+Бренд";
+            this.gcResults.Location = new System.Drawing.Point(591, 542);
+            this.gcResults.MainView = this.gvResults;
+            this.gcResults.Name = "gcResults";
+            this.gcResults.Size = new System.Drawing.Size(720, 360);
+            this.gcResults.TabIndex = 27;
+            this.gcResults.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gvResults});
             // 
-            // label7
+            // gvResults
             // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label7.Location = new System.Drawing.Point(639, 390);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(99, 18);
-            this.label7.TabIndex = 15;
-            this.label7.Text = "Коэф. Бренд";
+            this.gvResults.GridControl = this.gcResults;
+            this.gvResults.Name = "gvResults";
             // 
-            // koeffBrandOnly
+            // timeSearchLabel
             // 
-            this.koeffBrandOnly.EditValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.koeffBrandOnly.Location = new System.Drawing.Point(780, 387);
-            this.koeffBrandOnly.Name = "koeffBrandOnly";
-            this.koeffBrandOnly.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.koeffBrandOnly.Properties.Appearance.Options.UseFont = true;
-            this.koeffBrandOnly.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.koeffBrandOnly.Properties.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            131072});
-            this.koeffBrandOnly.Properties.MaxValue = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.koeffBrandOnly.Size = new System.Drawing.Size(58, 24);
-            this.koeffBrandOnly.TabIndex = 14;
+            this.timeSearchLabel.AutoSize = true;
+            this.timeSearchLabel.Location = new System.Drawing.Point(40, 929);
+            this.timeSearchLabel.Name = "timeSearchLabel";
+            this.timeSearchLabel.Size = new System.Drawing.Size(85, 13);
+            this.timeSearchLabel.TabIndex = 28;
+            this.timeSearchLabel.Text = "Время поиска: ";
             // 
-            // label3
+            // listBoxControl1
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1051, 318);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(35, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "label3";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
+            this.listBoxControl1.Location = new System.Drawing.Point(123, 542);
+            this.listBoxControl1.Name = "listBoxControl1";
+            this.listBoxControl1.Size = new System.Drawing.Size(300, 360);
+            this.listBoxControl1.TabIndex = 29;
+            this.listBoxControl1.SelectedIndexChanged += new System.EventHandler(this.listBoxControl1_SelectedIndexChanged);
             // 
-            // dataGridView3
+            // searchControl1
             // 
-            this.dataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView3.Location = new System.Drawing.Point(1054, 447);
-            this.dataGridView3.Name = "dataGridView3";
-            this.dataGridView3.Size = new System.Drawing.Size(455, 367);
-            this.dataGridView3.TabIndex = 16;
+            this.searchControl1.Client = this.gcUsku;
+            this.searchControl1.Location = new System.Drawing.Point(311, 35);
+            this.searchControl1.Name = "searchControl1";
+            this.searchControl1.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Repository.ClearButton(),
+            new DevExpress.XtraEditors.Repository.SearchButton()});
+            this.searchControl1.Properties.Client = this.gcUsku;
+            this.searchControl1.Size = new System.Drawing.Size(166, 20);
+            this.searchControl1.TabIndex = 30;
             // 
-            // label6
+            // searchControl2
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(1051, 828);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(35, 13);
-            this.label6.TabIndex = 17;
-            this.label6.Text = "label6";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(939, 447);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(97, 13);
-            this.label8.TabIndex = 18;
-            this.label8.Text = "Токены артикулы";
+            this.searchControl2.Client = this.gcResults;
+            this.searchControl2.Location = new System.Drawing.Point(617, 516);
+            this.searchControl2.Name = "searchControl2";
+            this.searchControl2.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Repository.ClearButton(),
+            new DevExpress.XtraEditors.Repository.SearchButton()});
+            this.searchControl2.Properties.Client = this.gcResults;
+            this.searchControl2.Size = new System.Drawing.Size(166, 20);
+            this.searchControl2.TabIndex = 31;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1904, 961);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.dataGridView3);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.koeffBrandOnly);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.koeffConcate);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.searchControl2);
+            this.Controls.Add(this.searchControl1);
+            this.Controls.Add(this.listBoxControl1);
+            this.Controls.Add(this.timeSearchLabel);
+            this.Controls.Add(this.gcResults);
+            this.Controls.Add(this.SearchButton);
+            this.Controls.Add(this.SearchWordEdit);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.listBox1);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.dataGridView2);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.gcToken);
+            this.Controls.Add(this.gcUsku);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeffConcate.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.koeffBrandOnly.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gcUsku)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvUsku)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gcToken)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvToken)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SearchWordEdit.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gcResults)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvResults)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.listBoxControl1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchControl1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchControl2.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridView dataGridView2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button2;
+        private DevExpress.XtraGrid.GridControl gcUsku;
+        private DevExpress.XtraGrid.Views.Grid.GridView gvUsku;
+        private DevExpress.XtraGrid.GridControl gcToken;
+        private DevExpress.XtraGrid.Views.Grid.GridView gvToken;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label2;
-        public DevExpress.XtraEditors.SpinEdit koeffConcate;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label7;
-        public DevExpress.XtraEditors.SpinEdit koeffBrandOnly;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.DataGridView dataGridView3;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label8;
+        private DevExpress.XtraEditors.TextEdit SearchWordEdit;
+        private DevExpress.XtraEditors.SimpleButton SearchButton;
+        private DevExpress.XtraGrid.GridControl gcResults;
+        private DevExpress.XtraGrid.Views.Grid.GridView gvResults;
+        private System.Windows.Forms.Label timeSearchLabel;
+        private DevExpress.XtraEditors.ListBoxControl listBoxControl1;
+        private DevExpress.XtraEditors.SearchControl searchControl1;
+        private DevExpress.XtraEditors.SearchControl searchControl2;
     }
 }
 
