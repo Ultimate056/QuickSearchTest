@@ -126,6 +126,75 @@ namespace QuickSearchTest
 
         private void SearchButton_Click(object sender, EventArgs e)
         {
+            //timer.Start();
+            //gcMatches.DataSource = null;
+            //gcResults.DataSource = null;
+            //#region Формируем токены введенных слов
+            //SearchValueTokens = new List<string>();
+            //string searchWord = SearchWordEdit.EditValue.ToString();
+            //List<string> words = LogicSearch.NormalizeString(searchWord);
+            //foreach (var word in words)
+            //{
+            //    List<string> valueTokens = LogicSearch.TokenizeWord(word);
+            //    foreach (var token in valueTokens)
+            //    {
+            //        SearchValueTokens.Add(token);
+            //    }
+            //}
+            //#endregion
+
+            //int searchCountTokens = SearchValueTokens.Count;
+
+            //// Выборка всех обнаруженных токенов
+            //List<PairToken> findTokens = tokens.Join(SearchValueTokens, x => x.Value, j => j,
+            //    (x, j) => new PairToken { idToken = x.idToken, Id = x.Id, Value = x.Value })
+            //    .ToList();
+
+            //// Выбираем id usku обнаруженных токенов
+            //var listOfUsku = findTokens.Select(x => new { x.Id.IdPair, x.Id.Filter });
+
+            //var Dict = listOfUsku.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+            //// По id создаем словарь : id - кол-во и отсортировываем по убыванию
+
+            //List<PairMatch> matches = Dict.Select(x => new PairMatch
+            //{
+            //    Key = new CompositeKeyPair { IdPair = x.Key.IdPair, Filter = x.Key.Filter},
+            //    count = x.Value
+            //}).Distinct(new MatchEqualityComparer()).ToList();
+
+
+            //// Берем первые совпадения по кол-ву найденных токенов
+            //List<PairMatch> top = matches.OrderByDescending(x=> x.count).Take(15).ToList();
+
+
+            //DataTable dtRes = new DataTable();
+            //dtRes.Columns.Add("idUSKU");
+            //dtRes.Columns.Add("filter");
+            //dtRes.Columns.Add("nameMatch");
+
+            //foreach (PairMatch match in top)
+            //{
+            //    string nameMatch = rowsUSKU.Where(x => parse(x["idusku"]).Equals(match.Key.IdPair) && parse(x["filter"]).Equals(match.Key.Filter))
+            //        .Select(x => x["nameusku"].ToString()).FirstOrDefault();
+
+            //    dtRes.Rows.Add(match.Key.IdPair, match.Key.Filter, nameMatch);
+            //}
+
+            //// Заполняем найденные совпадения
+            //gcMatches.DataSource = dtRes;
+
+            //timer.Stop();
+
+            //timeSearchLabel.Text = "Время поиска " + timer.Elapsed.ToString(@"m\:ss\.fff");
+            //timer.Reset();
+        }
+
+
+        private void SearchWordEdit_EditValueChanged(object sender, EventArgs e)
+        {
+            if (SearchWordEdit.Text.Length < 3)
+                return;
+
             timer.Start();
             gcMatches.DataSource = null;
             gcResults.DataSource = null;
@@ -158,13 +227,13 @@ namespace QuickSearchTest
 
             List<PairMatch> matches = Dict.Select(x => new PairMatch
             {
-                Key = new CompositeKeyPair { IdPair = x.Key.IdPair, Filter = x.Key.Filter},
+                Key = new CompositeKeyPair { IdPair = x.Key.IdPair, Filter = x.Key.Filter },
                 count = x.Value
             }).Distinct(new MatchEqualityComparer()).ToList();
 
 
             // Берем первые совпадения по кол-ву найденных токенов
-            List<PairMatch> top = matches.OrderByDescending(x=> x.count).Take(15).ToList();
+            List<PairMatch> top = matches.OrderByDescending(x => x.count).Take(15).ToList();
 
 
             DataTable dtRes = new DataTable();
@@ -182,79 +251,28 @@ namespace QuickSearchTest
 
             // Заполняем найденные совпадения
             gcMatches.DataSource = dtRes;
+            gvMatches.FocusedRowHandle = 0;
+
+            gvMatches_RowClick(gvMatches, null);
 
             timer.Stop();
 
             timeSearchLabel.Text = "Время поиска " + timer.Elapsed.ToString(@"m\:ss\.fff");
             timer.Reset();
-        }
 
 
-        private void SearchWordEdit_EditValueChanged(object sender, EventArgs e)
-        {
-
-            //timer.Start();
-            //listBoxControl1.DataSource = null;
-            //gcResults.DataSource = null;
-            //#region Формируем токены введенных слов
-            //SearchValueTokens = new List<string>();
-            //string searchWord = SearchWordEdit.EditValue.ToString();
-            //List<string> words = LogicSearch.NormalizeString(searchWord);
-            //foreach (var word in words)
-            //{
-            //    Dictionary<string, bool> valueTokens = LogicSearch.TokenizeWord(word, true);
-            //    foreach (var token in valueTokens)
-            //    {
-            //        SearchValueTokens.Add(token.Key);
-            //    }
-            //}
-            //#endregion
-
-            //int searchCountTokens = SearchValueTokens.Count;
-
-            //// Выбираем обнаруженные токены
-            //List<PairToken> findTokens = tokens.Join(SearchValueTokens, x => x.Value, j => j,
-            //    (x, j) => new PairToken { idToken = x.idToken, idUSKU = x.idUSKU, IsPriority = x.IsPriority, Value = x.Value })
-            //    .Distinct().ToList();
-
-            //// Выбираем кол-во найденных USKU из обнаруженных
-            //IEnumerable<int> listOfUsku = findTokens
-            //                .Select(x => x.idUSKU);
-
-
-            //var matches = listOfUsku.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count())
-            //    .Select(x => new PairMatch { idUSKU = x.Key, count = x.Value }).OrderByDescending(x => x.count).ToList();
-
-            //List<PairMatch> top = matches.Take(5).ToList();
-
-            //if (top == null)
-            //{
-            //    timer.Stop(); timer.Reset();
-            //    return;
-            //}
-
-            //List<string> res = top.Join(rowsUSKU, x => x.idUSKU,
-            //    j => parse(j["idusku"]), (x, j) => j["nameusku"].ToString()).ToList();
-
-
-            //listBoxControl1.DataSource = res;
-
-            //timer.Stop();
-
-            //timeSearchLabel.Text = "Время поиска " + timer.Elapsed.ToString(@"m\:ss\.fff");
-            //timer.Reset();
         }
 
         private void SearchWordEdit_EditValueChanging(object sender, DevExpress.XtraEditors.Controls.ChangingEventArgs e)
         {
-            //Thread.Sleep(10);
+            Thread.Sleep(10);
         }
 
         private void gvMatches_RowClick(object sender, DevExpress.XtraGrid.Views.Grid.RowClickEventArgs e)
         {
             if (gvMatches.FocusedRowHandle < 0)
                 return;
-
+            
             try
             {
                 gcResults.DataSource = null;

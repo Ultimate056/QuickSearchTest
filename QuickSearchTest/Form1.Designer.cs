@@ -126,6 +126,7 @@
             this.SearchButton.Name = "SearchButton";
             this.SearchButton.Size = new System.Drawing.Size(39, 35);
             this.SearchButton.TabIndex = 26;
+            this.SearchButton.Visible = false;
             this.SearchButton.Click += new System.EventHandler(this.SearchButton_Click);
             // 
             // gcResults
