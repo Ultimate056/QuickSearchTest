@@ -13,11 +13,12 @@ namespace QuickSearchTest.Models
     {
         //public int _idTov { get; private set; }
 
-        public int idUSKU { get; set; }
+        public CompositeKeyPair Id { get; set; }
 
         public int idToken { get; set; }
 
         public string Value { get; set; }
+
 
         public PairToken() { }
 

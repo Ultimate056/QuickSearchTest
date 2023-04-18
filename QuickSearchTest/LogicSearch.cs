@@ -27,6 +27,8 @@ namespace QuickSearchTest
             {
                 for (int i = 0; i < subStr.Length; i++)
                 {
+                    if (subStr[i].Length <= 1 || subStr[i].Trim() == "")
+                        continue;
                     string subValue = DelSymbols(subStr[i], Special);
                     subValue = DelSymbols(subValue, RULetters);
 
@@ -64,46 +66,48 @@ namespace QuickSearchTest
 
         /// <summary>
         /// Разбивает слово на токены
+        /// optional - 
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
-        public static Dictionary<string, bool> TokenizeWord(string word, bool optional = false)
+        public static List<string> TokenizeWord(string word, bool optional = false)
         {
-            var listResult = new Dictionary<string, bool>();
+            var listResult = new List<string>();
+            int maxLenToken = Program.lengthToken;
+            int lenWord = word.Length;
 
-            if (word.ToArray().Length <= Program.lengthToken)
+
+
+            if (word.ToArray().Length <= maxLenToken)
             {
-                listResult.Add(word, true);
+                listResult.Add(word);
             }
             else
             {
-
-                int le = Program.lengthToken;
-                int wle = word.Length;
                 if (optional)
                 {
-                    for (int i = 0; i < wle; i++)
+                    for (int i = 0; i < lenWord; i++)
                     {
-                        if (le <= wle - i)
+                        if (maxLenToken <= lenWord - i)
                         {
-                            string str1 = word.Substring(i, le);
-                            listResult.Add(str1, false);
+                            string str1 = word.Substring(i, maxLenToken);
+                            listResult.Add(str1);
                         }
-                        if (le - 1 <= wle - i)
+                        if (maxLenToken - 1 <= lenWord - i)
                         {
-                            string str2 = word.Substring(i, le - 1);
-                            listResult.Add(str2, false);
+                            string str2 = word.Substring(i, maxLenToken - 1);
+                            listResult.Add(str2);
                         }
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < wle; i++)
+                    for (int i = 0; i < lenWord; i++)
                     {
-                        if (le <= wle - i)
+                        if (maxLenToken <= lenWord - i)
                         {
-                            string str1 = word.Substring(i, le);
-                            listResult.Add(str1, false);
+                            string str1 = word.Substring(i, maxLenToken);
+                            listResult.Add(str1);
                         }
                     }
                 }

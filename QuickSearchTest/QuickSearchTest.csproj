@@ -86,7 +86,10 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="LogicSearch.cs" />
+    <Compile Include="Models\CompositeKeyPair.cs" />
+    <Compile Include="Models\MatchEqualityComparer.cs" />
     <Compile Include="Models\PairMatch.cs" />
+    <Compile Include="Models\PairTemp.cs" />
     <Compile Include="Models\PairToken.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

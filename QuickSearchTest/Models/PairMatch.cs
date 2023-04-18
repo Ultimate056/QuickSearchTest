@@ -11,9 +11,14 @@ namespace QuickSearchTest.Models
     /// /// </summary>
     public class PairMatch
     {
-        public int idUSKU { get; set; }
+        public CompositeKeyPair Key { get; set; }
 
         public int count { get; set; }
+
+        public PairMatch()
+        {
+
+        }
 
     }
 }
